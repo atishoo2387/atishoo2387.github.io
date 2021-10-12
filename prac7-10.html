@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>book 객체 만들기</title>
+</head>
+<body>
+<h3>book 객체 만들기</h3>
+<hr>
+<script>
+var bookarr =[];
+function Bookar(data, i){
+    var sub = data.split(",");
+    var book = new Object();
+	book.title = sub[0]; 
+	book.author = sub[1];
+	book.price = parseInt(sub[2]);
+    Bookar[i] = book;
+	document.write(sub[0] + ", ");
+	document.write(sub[1] + ", ");
+	document.write(sub[2] + "<br>");
+}
+</script>
+<script>
+function expensive(){
+    var exp = new Object();
+    exp.price = 0;
+    for(var i=0; i<5; i++){
+        if(exp.price < bookarr[i].price){
+            exp = bookarr[i];
+        }
+    }
+    return exp;
+}
+</script>
+<script>
+for(var i=0; i<5; i++){
+    var data = prompt("콤마(,)로 분리하면서 책제목 저자 가격 순으로 입력");
+    Bookar(data, i);
+}
+document.write("<hr>");
+var exp = expensive();
+document.write("가장 가격이 비싼 책은" + exp.title);
+</script>
+</body>
+</html>

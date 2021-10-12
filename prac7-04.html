@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>방문 시간에 따라 변하는 배경색</title></head>
+<body>
+<h3>일요일은 pink, 다른 요일은 gold 배경</h3>
+<hr>
+<script>
+var current = new Date();
+if(current.getDay() > 0)
+	document.body.style.backgroundColor = "gold";
+else
+	document.body.style.backgroundColor = "pink";
+
+document.write("오늘 : ");
+document.write(current.getDate() + "일, ");
+var week = ["일", "월", "화", "수", "목", "금", "토"];
+var i = current.getDay();
+document.write(week[i] + "요일");
+</script>
+</body>
+</html>
