@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>클릭하면 2,3,4배로 옆으로 늘어납니다.</title>
+</head>
+<body>
+<script>
+    let a = 2;
+    function transform() {
+        let name = document.getElementById("tran");
+        tran.style.transform="scaleX("+a+")";
+        a++;
+}
+</script>
+<h3>클릭하면 2,3,4배로 옆으로 늘어납니다.</h3>
+<hr>
+<img id = "tran" onclick = "transform()" src="media/1.png" width = "100" height="100" alt = "스폰지밥">
+</body>
+</html>
