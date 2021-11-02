@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>계산기 만들기</title>
+<style>
+input {
+    width: 90%;
+}
+</style>
+<script>
+function init(){
+    let a = document.getElementById("cal");
+    a.value = "";
+}
+function Cal(num){
+    let a = document.getElementById("cal");
+    if(a.val == "0") a.value = num.value;
+    else a.value += num.value;
+}
+function back(){
+    let a = document.getElementById("cal");
+    let b = a. value.length;
+    a.value = a.value.substr(0, (b-1));
+}
+function result(){
+    let a = document.getElementById("cal");
+    a.value = eval(a.value);
+}
+</script>
+</head>
+<body onload="init()">
+<h3>계산기 만들기</h3>
+<hr>
+<form>
+    <input type="text" id="cal" width="80%" value=""><br>
+    <table border="0" style="width: 80%; height: 80%;">
+        <tr><td><input type="button" value="back" onclick="back()"></td><td><input type="button" value="CE" onclick="init()"></td>
+        <td><input type="button" value="C" onclick="init()"></td><td><input type="button" value="=" onclick="result()"></td></tr>
+        <tr><td><input type="button" value="7" onclick="Cal(this)"></td><td><input type="button" value="8" onclick="Cal(this)"></td>
+        <td><input type="button" value="9" onclick="Cal(this)"></td><td><input type="button" value="/" onclick="Cal(this)"></td></tr>
+        <tr><td><input type="button" value="4" onclick="Cal(this)"></td><td><input type="button" value="5" onclick="Cal(this)"></td>
+        <td><input type="button" value="6" onclick="Cal(this)"></td><td><input type="button" value="*" onclick="Cal(this)"></td></tr>
+        <tr><td><input type="button" value="1" onclick="Cal(this)"></td><td><input type="button" value="2" onclick="Cal(this)"></td>
+        <td><input type="button" value="3" onclick="Cal(this)"></td><td><input type="button" value="-" onclick="Cal(this)"></td></tr>
+        <tr><td><input type="button" value="0" onclick="Cal(this)"></td><td><input type="button" value="+" onclick="Cal(this)"></td>
+        <td><input type="button" value="NONE"></td><td><input type="button" value="NONE"></td></tr>
+    </table>
+</form>
+</body>
+</html>
