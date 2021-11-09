@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>산수 문제를 풀어 봅시다.</title>
+<style>
+td {
+    padding-left : 13px;
+    padding-right : 13px;
+}
+</style>
+<script>
+    let show=null, count;
+    function ontime() {
+        document.getElementById("grade").innerHTML = 0;
+        var time = document.getElementById("time");
+        count = 10;
+        if(show != null)
+        clearTimeout(show);
+        outtime(time);
+    }
+    function outtime(cls) {
+        count--;
+        cls.innerHTML = count;
+        if(count != 0) show = setTimeout("outtime(time)", 1000);
+        else correct();
+    }
+    function make() {
+        let one = document.getElementsByClassName("one");
+        var two = document.getElementsByClassName("two");
+        for(i=0; i<one.length; i++) {
+            let num1 = Math.floor(Math.random()*99);
+            let num2 = Math.floor(Math.random()*99);
+            let op = Math.floor(Math.random()*4);
+            let operator;
+            switch(op) {
+                case 0 : operator = "+";
+                break;
+                case 1 : operator = "-";
+                break;
+                case 2 : operator = "*";
+                break;
+                case 3 : operator = "/";
+                break;
+            }
+            one[i].innerHTML = num1 + operator + num2;
+        }
+    }
+function correct() {
+    let countgrade = 0;
+    let one = document.getElementsByClassName("one");
+    let two = document.getElementsByClassName("two");
+    for(i=0; i<one.length; i++) {
+        let question = one[i].innerHTML;
+        let answer = two[i].value;
+        let correct = Math.floor(eval(question));
+        if(parseInt(answer) == correct) countgrade += 1;
+        else if(answer=="") one[i].style.textDecoration = "line-through";
+        else if(isNaN(answer)) one[i].style.textDecoration = "line-through";
+        else one[i].style.textDecoration = "line-through";
+    }
+    document.getElementById("grade").innerHTML = countgrade;
+    }
+</script>
+</head>
+<body onload="ontime(), make()">
+<h3>산수 문제를 풀어 봅시다.</h3>
+문제는 자동으로 생성되며, 10초가 지나면 자동 채점됩니다.
+<div>
+남은 시간 <span id="time">0</span>
+</div>
+<hr>
+<form>
+<table>
+    <tr><td class="one"></td><td><input class="two" type="text" size="6"></td></tr>
+    <tr><td class="one"></td><td><input class="two" type="text" size="6"></td></tr>
+    <tr><td class="one"></td><td><input class="two" type="text" size="6"></td></tr>
+    <tr><td class="one"></td><td><input class="two" type="text" size="6"></td></tr>
+    <tr><td><button type="button" onclick="ontime(), make()">다시</button></td><td><span id="grade">0</span></td></tr>
+</table>
+</form>
+</body>
+</html>
