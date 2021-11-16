@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>재난문자</title>
+<style>
+table{
+    width : 100%;
+}
+th, td{
+    border: 1px solid;
+}
+</style>
+</head>
+<body>
+<h3>재난문자 현황</h3>
+<button type="button" onclick="loadDoc()">현황</button>
+<br><br>
+<table id="tb"></table>
+<script>
+    function loadDoc() {
+        let xhr = new XMLHttpRequest();
+        let url = 'http://apis.data.go.kr/1741000/DisasterMsg3/getDisasterMsg1List';
+        let queryParams = '?' + encodeURIComponent('ServiceKey') + '=' +'ZBsjF/dpDGy4ttro8MXcmk54MzIqx7MKRa8Hjl0empaGL2tMoQ23G2av09XPy8LYe875HB1T18/nyRtNdMwbbQ==';
+        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
+        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');
+        queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml');
+        xhr.onload = function(){
+            myFunction(this);
+        }
+        xhr.open("GET", url + queryParams);
+        xhr.send();
+    }
+    function myFunction(xml){
+        const xmlDoc = xml.responseXML;
+        const x = xmlDoc.getElementsByTagName("row");
+        let table = "<tr><th>지역</th><th>내용</th></tr>";
+        for(let i = 0; i<x.length; i++){
+            table += "<tr><td>" + x[i].getElementsByTagName("location_name")[0].childNodes[0].nodeValue +"</td><td>"+ x[i].getElementsByTagName("msg")[0].childNodes[0].nodeValue + "</td></tr>";
+        }
+        document.getElementById("tb").innerHTML = table;
+    }
+</script>
+</body>
+</html>
