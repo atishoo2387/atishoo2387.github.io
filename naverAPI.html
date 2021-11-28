@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>간단한 지도 표시하기</title>
+
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
+    
+    <!-- naver map -->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=yje5mz1g6c"></script>
+    <style>
+        table,th,td {
+          border : 1px solid black;
+          border-collapse: collapse;
+        }
+        th,td {
+          padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<div id="map" style="width:100%;height:400px;"></div>
+<table id="table"></table>
+<script>
+var xhr = new XMLHttpRequest();
+var url = 'http://apis.data.go.kr/1741000/DisasterMsg4/getDisasterMsg2List'; /*URL*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'ZBsjF/dpDGy4ttro8MXcmk54MzIqx7MKRa8Hjl0empaGL2tMoQ23G2av09XPy8LYe875HB1T18/nyRtNdMwbbQ=='; /*Service Key*/
+queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+queryParams += '&' + encodeURIComponent('create_date') + '=' + encodeURIComponent('2021/06/22 00:00:00'); /**/
+// queryParams += '&' + encodeURIComponent('location_name') + '=' + encodeURIComponent('제주특별자치도'); /**/
+
+
+var HOME_PATH = "https://navermaps.github.io/maps.js/docs",
+    urlPrefix = HOME_PATH +'/data/region',
+    urlSuffix = '.json',
+    regionGeoJson = [],
+    loadCount = 0;
+
+var map = new naver.maps.Map(document.getElementById('map'), {
+    zoom: 7,
+    mapTypeId: 'normal',
+    center: new naver.maps.LatLng(36.4203004, 128.317960)
+});
+
+// 지도가 로드된 다음에 일회성으로 실행되는 이벤트
+naver.maps.Event.once(map, 'init_stylemap', function () {
+    for (var i = 1; i < 18; i++) {
+        var keyword = i +'';
+
+        if (keyword.length === 1) {
+            keyword = '0'+ keyword;
+        }
+        // 01, 02, 03 생성
+
+        $.ajax({
+            url: urlPrefix + keyword + urlSuffix,
+            success: function(idx) {
+                return function(geojson) {
+                    regionGeoJson[idx] = geojson;
+
+                    loadCount++;
+                    // 17개 다 받아오면 그리기 시작
+                    if (loadCount === 17) {
+                        startDataLayer();
+                    }
+                }
+            }(i - 1)
+        });
+    }
+});
+
+var tooltip = $('<div style="position:absolute;z-index:1000;padding:5px 10px;background-color:#fff;border:solid 2px #000;font-size:14px;pointer-events:none;display:none;"></div>');
+tooltip.appendTo(map.getPanes().floatPane);
+
+
+function startDataLayer() {
+
+    map.data.setStyle(function(feature) {
+        
+        // 기본 라인 
+        var styleOptions = {
+            fillColor: '#ff0000',
+            fillOpacity: 0.0001,
+            strokeColor: '#ff0000',
+            strokeWeight: 2,
+            strokeOpacity: 0.4
+        };
+
+        // 마우스 올라갔을 떄 스타일
+        if (feature.getProperty('focus')) {
+            styleOptions.fillOpacity = 0.6;
+            styleOptions.fillColor = '#0f0';
+            styleOptions.strokeColor = '#0f0';
+            styleOptions.strokeWeight = 4;
+            styleOptions.strokeOpacity = 1;
+        }
+
+        return styleOptions;
+    });
+
+    // 제가 받아온 Geojson파일을 map.data
+    regionGeoJson.forEach(function(geojson) {
+        map.data.addGeoJson(geojson);
+    });
+
+    map.data.addListener('click', function(e) {
+        var feature = e.feature;
+
+        // 여기서 다른 선택된 지역 있는지 지워줘야 됩니당
+        // 지워주는 방법은
+        // map.data._features 를 foreach 하면서 focus 끄시면 됩니다.
+        if (feature.getProperty('focus') !== true) {
+            //클릭된 다른 지역 지우기 
+            map.data._features.forEach(
+                function(feature){
+                    feature.setProperty('focus', false);
+                }
+            );
+            
+            document.getElementById("table").innerHTML = feature.getProperty('area1');
+            queryParams += '&' + encodeURIComponent('location_name') + '=' + encodeURIComponent(feature.getProperty('area1')); /**/
+            //공공 데이터 포털 API 요청과 응답을 받아 테이블로 작성
+            xhr.open('GET', url + queryParams);
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    document.getElementById("table").innerHTML = 'Status: '+this.status+'nHeaders: '+JSON.stringify(this.getAllResponseHeaders())+'nBody: '+this.responseText;
+                    //alert('Status: '+this.status+'nHeaders: '+JSON.stringify(this.getAllResponseHeaders())+'nBody: '+this.responseText);
+                    xhr.onload = function(){
+                    myFunction(this);
+                    }
+                    function myFunction(xml){
+                    const xmlDoc = xml.responseXML;
+                    const x = xmlDoc.getElementsByTagName("row");
+                    let table = "<tr><th>지역</th><th>내용</th></tr>";
+                    for(let i = 0; i<x.length; i++){
+                        table += "<tr><td>" + x[i].getElementsByTagName("location_name")[0].childNodes[0].nodeValue +"</td><td>"+ x[i].getElementsByTagName("msg")[0].childNodes[0].nodeValue + "</td></tr>";
+                    }
+                    document.getElementById("table").innerHTML = table;
+                    }
+                }
+            };
+            xhr.send('');
+            //테이블 생성
+            //build_table(feature.getProperty('area1'));
+            feature.setProperty('focus', true);
+        } else {
+            //clear_table();
+            feature.setProperty('focus', false);
+        }
+    });
+    map.data.addListener('mouseover', function(e) {
+        
+        // 이름을 받아
+        var feature = e.feature,
+            regionName = feature.getProperty('area1');
+            // 강원도
+
+        // 지역명 뜨는거 
+        tooltip.css({
+            display: '',
+            left: e.offset.x,
+            top: e.offset.y
+        }).text(regionName);
+
+        map.data.overrideStyle(feature, {
+            fillOpacity: 0.6,
+            strokeWeight: 4,
+            strokeOpacity: 1
+        });
+    });
+
+    map.data.addListener('mouseout', function(e) {
+        // 툴팁 사라지게 하고
+        tooltip.hide().empty();
+
+        // 스타일 원상복귀시키는
+        map.data.revertStyle();
+    });
+}
+
+</script>
+</body>
+</html>
